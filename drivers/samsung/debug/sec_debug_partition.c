@@ -83,7 +83,7 @@ static struct {
 
 static int __init get_bootdevice(char *str)
 {
-	strncpy(debugpartition_path, "/dev/sda8", sizeof(debugpartition_path);
+	strncpy(debugpartition_path, "/dev/sda8", sizeof(debugpartition_path));
 	return 0;
 }
 early_param("androidboot.bootdevice", get_bootdevice);
