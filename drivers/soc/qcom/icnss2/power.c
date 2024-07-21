@@ -83,7 +83,7 @@ static int icnss_get_vreg_single(struct icnss_priv *priv,
 					     vreg->cfg.name, ret);
 			goto out;
 			} else {
-				icnss_pr_dbg("Optional regulator %s doesn't exist: %d\n",
+				icnss_pr_info("Optional regulator %s doesn't exist: %d\n",
 					     vreg->cfg.name, ret);
 				goto done;
 			}
@@ -101,11 +101,11 @@ static int icnss_get_vreg_single(struct icnss_priv *priv,
 
 	prop = of_get_property(dev->of_node, prop_name, &len);
 
-	icnss_pr_dbg("Got regulator config, prop: %s, len: %d\n",
+	icnss_pr_info("Got regulator config, prop: %s, len: %d\n",
 		     prop_name, len);
 
 	if (!prop || len < (2 * sizeof(__be32))) {
-		icnss_pr_dbg("Property %s %s, use default\n", prop_name,
+		icnss_pr_info("Property %s %s, use default\n", prop_name,
 			     prop ? "invalid format" : "doesn't exist");
 		goto done;
 	}
@@ -131,14 +131,14 @@ static int icnss_get_vreg_single(struct icnss_priv *priv,
 				vreg->cfg.need_unvote = 0;
 			break;
 		default:
-			icnss_pr_dbg("Property %s, ignoring value at %d\n",
+			icnss_pr_info("Property %s, ignoring value at %d\n",
 				     prop_name, i);
 			break;
 		}
 	}
 
 done:
-	icnss_pr_dbg("Got regulator: %s, min_uv: %u, max_uv: %u, load_ua: %u, delay_us: %u, need_unvote: %u\n",
+	icnss_pr_info("Got regulator: %s, min_uv: %u, max_uv: %u, load_ua: %u, delay_us: %u, need_unvote: %u\n",
 		     vreg->cfg.name, vreg->cfg.min_uv,
 		     vreg->cfg.max_uv, vreg->cfg.load_ua,
 		     vreg->cfg.delay_us, vreg->cfg.need_unvote);
@@ -154,12 +154,12 @@ static int icnss_vreg_on_single(struct icnss_vreg_info *vreg)
 	int ret = 0;
 
 	if (vreg->enabled) {
-		icnss_pr_dbg("Regulator %s is already enabled\n",
+		icnss_pr_info("Regulator %s is already enabled\n",
 			     vreg->cfg.name);
 		return 0;
 	}
 
-	icnss_pr_dbg("Regulator %s is being enabled\n", vreg->cfg.name);
+	icnss_pr_info("Regulator %s is being enabled\n", vreg->cfg.name);
 
 	if (vreg->cfg.min_uv != 0 && vreg->cfg.max_uv != 0) {
 		ret = regulator_set_voltage(vreg->reg,
@@ -207,12 +207,12 @@ static int icnss_vreg_unvote_single(struct icnss_vreg_info *vreg)
 	int ret = 0;
 
 	if (!vreg->enabled) {
-		icnss_pr_dbg("Regulator %s is already disabled\n",
+		icnss_pr_info("Regulator %s is already disabled\n",
 			     vreg->cfg.name);
 		return 0;
 	}
 
-	icnss_pr_dbg("Removing vote for Regulator %s\n", vreg->cfg.name);
+	icnss_pr_info("Removing vote for Regulator %s\n", vreg->cfg.name);
 
 	if (vreg->cfg.load_ua) {
 		ret = regulator_set_load(vreg->reg, 0);
@@ -237,12 +237,12 @@ static int icnss_vreg_off_single(struct icnss_vreg_info *vreg)
 	int ret = 0;
 
 	if (!vreg->enabled) {
-		icnss_pr_dbg("Regulator %s is already disabled\n",
+		icnss_pr_info("Regulator %s is already disabled\n",
 			     vreg->cfg.name);
 		return 0;
 	}
 
-	icnss_pr_dbg("Regulator %s is being disabled\n",
+	icnss_pr_info("Regulator %s is being disabled\n",
 		     vreg->cfg.name);
 
 	ret = regulator_disable(vreg->reg);
@@ -414,13 +414,13 @@ int icnss_get_clk_single(struct icnss_priv *priv,
 			icnss_pr_err("Failed to get clock %s, err = %d\n",
 				     clk_info->cfg.name, ret);
 		else
-			icnss_pr_dbg("Failed to get optional clock %s, err = %d\n",
+			icnss_pr_info("Failed to get optional clock %s, err = %d\n",
 				     clk_info->cfg.name, ret);
 		return ret;
 	}
 
 	clk_info->clk = clk;
-	icnss_pr_dbg("Got clock: %s, freq: %u\n",
+	icnss_pr_info("Got clock: %s, freq: %u\n",
 		     clk_info->cfg.name, clk_info->cfg.freq);
 
 	return 0;
@@ -431,12 +431,12 @@ static int icnss_clk_on_single(struct icnss_clk_info *clk_info)
 	int ret;
 
 	if (clk_info->enabled) {
-		icnss_pr_dbg("Clock %s is already enabled\n",
+		icnss_pr_info("Clock %s is already enabled\n",
 			     clk_info->cfg.name);
 		return 0;
 	}
 
-	icnss_pr_dbg("Clock %s is being enabled\n", clk_info->cfg.name);
+	icnss_pr_info("Clock %s is being enabled\n", clk_info->cfg.name);
 
 	if (clk_info->cfg.freq) {
 		ret = clk_set_rate(clk_info->clk, clk_info->cfg.freq);
@@ -463,12 +463,12 @@ static int icnss_clk_on_single(struct icnss_clk_info *clk_info)
 static int icnss_clk_off_single(struct icnss_clk_info *clk_info)
 {
 	if (!clk_info->enabled) {
-		icnss_pr_dbg("Clock %s is already disabled\n",
+		icnss_pr_info("Clock %s is already disabled\n",
 			     clk_info->cfg.name);
 		return 0;
 	}
 
-	icnss_pr_dbg("Clock %s is being disabled\n", clk_info->cfg.name);
+	icnss_pr_info("Clock %s is being disabled\n", clk_info->cfg.name);
 
 	clk_disable_unprepare(clk_info->clk);
 	clk_info->enabled = false;
@@ -500,7 +500,7 @@ int icnss_get_clk(struct icnss_priv *priv)
 	}
 
 	if (!list_empty(clk_list)) {
-		icnss_pr_dbg("Clocks have already been updated\n");
+		icnss_pr_info("Clocks have already been updated\n");
 		return 0;
 	}
 
@@ -598,7 +598,7 @@ int icnss_hw_power_on(struct icnss_priv *priv)
 {
 	int ret = 0;
 
-	icnss_pr_dbg("HW Power on: state: 0x%lx\n", priv->state);
+	icnss_pr_info("HW Power on: state: 0x%lx\n", priv->state);
 
 	spin_lock(&priv->on_off_lock);
 	if (test_bit(ICNSS_POWER_ON, &priv->state)) {
@@ -637,7 +637,7 @@ int icnss_hw_power_off(struct icnss_priv *priv)
 	if (test_bit(ICNSS_FW_DOWN, &priv->state))
 		return 0;
 
-	icnss_pr_dbg("HW Power off: 0x%lx\n", priv->state);
+	icnss_pr_info("HW Power off: 0x%lx\n", priv->state);
 
 	spin_lock(&priv->on_off_lock);
 	if (!test_bit(ICNSS_POWER_ON, &priv->state)) {
@@ -664,7 +664,7 @@ int icnss_power_on(struct device *dev)
 		return -EINVAL;
 	}
 
-	icnss_pr_dbg("Power On: 0x%lx\n", priv->state);
+	icnss_pr_info("Power On: 0x%lx\n", priv->state);
 
 	return icnss_hw_power_on(priv);
 }
@@ -680,7 +680,7 @@ int icnss_power_off(struct device *dev)
 		return -EINVAL;
 	}
 
-	icnss_pr_dbg("Power Off: 0x%lx\n", priv->state);
+	icnss_pr_info("Power Off: 0x%lx\n", priv->state);
 
 	return icnss_hw_power_off(priv);
 }
@@ -763,7 +763,7 @@ static void icnss_vph_notify(enum adc_tm_state state, void *ctx)
 
 	if (update) {
 		icnss_send_vbatt_update(priv, vph_pwr);
-		icnss_pr_dbg("set low threshold to %d, high threshold to %d Phone power=%llu\n",
+		icnss_pr_info("set low threshold to %d, high threshold to %d Phone power=%llu\n",
 			     priv->vph_monitor_params.low_thr,
 			     priv->vph_monitor_params.high_thr, vph_pwr);
 	}
@@ -790,7 +790,7 @@ static int icnss_setup_vph_monitor(struct icnss_priv *priv)
 	priv->vph_monitor_params.channel = ADC5_VBAT_SNS;
 	priv->vph_monitor_params.btm_ctx = priv;
 	priv->vph_monitor_params.threshold_notification = &icnss_vph_notify;
-	icnss_pr_dbg("Set low threshold to %d, high threshold to %d\n",
+	icnss_pr_info("Set low threshold to %d, high threshold to %d\n",
 		     priv->vph_monitor_params.low_thr,
 		     priv->vph_monitor_params.high_thr);
 
@@ -810,7 +810,7 @@ int icnss_init_vph_monitor(struct icnss_priv *priv)
 	if (ret < 0)
 		goto out;
 
-	icnss_pr_dbg("Phone power=%llu\n", priv->vph_pwr);
+	icnss_pr_info("Phone power=%llu\n", priv->vph_pwr);
 
 	icnss_send_vbatt_update(priv, priv->vph_pwr);
 
@@ -834,21 +834,21 @@ int icnss_get_cpr_info(struct icnss_priv *priv)
 
 	res = platform_get_resource_byname(plat_dev, IORESOURCE_MEM, "tcs_cmd");
 	if (!res) {
-		icnss_pr_dbg("TCS CMD address is not present for CPR\n");
+		icnss_pr_info("TCS CMD address is not present for CPR\n");
 		goto out;
 	}
 
 	ret = of_property_read_string(plat_dev->dev.of_node,
 				      "qcom,cmd_db_name", &cmd_db_name);
 	if (ret) {
-		icnss_pr_dbg("CommandDB name is not present for CPR\n");
+		icnss_pr_info("CommandDB name is not present for CPR\n");
 		goto out;
 	}
 
 	cpr_pmic_addr = cmd_db_read_addr(cmd_db_name);
 	if (cpr_pmic_addr > 0) {
 		cpr_info->cpr_pmic_addr = cpr_pmic_addr;
-		icnss_pr_dbg("Get CPR PMIC address 0x%x from %s\n",
+		icnss_pr_info("Get CPR PMIC address 0x%x from %s\n",
 			     cpr_info->cpr_pmic_addr, cmd_db_name);
 	} else {
 		icnss_pr_err("CPR PMIC address is not available for %s\n",
@@ -859,7 +859,7 @@ int icnss_get_cpr_info(struct icnss_priv *priv)
 
 	cpr_info->tcs_cmd_base_addr = res->start;
 	addr_len = resource_size(res);
-	icnss_pr_dbg("TCS CMD base address is %pa with length %pa\n",
+	icnss_pr_info("TCS CMD base address is %pa with length %pa\n",
 		     &cpr_info->tcs_cmd_base_addr, &addr_len);
 
 	tcs_cmd_base_addr = devm_ioremap_resource(&plat_dev->dev, res);
@@ -886,7 +886,7 @@ int icnss_update_cpr_info(struct icnss_priv *priv)
 	int i, j;
 
 	if (cpr_info->tcs_cmd_base_addr == 0) {
-		icnss_pr_dbg("CPR is not enabled\n");
+		icnss_pr_info("CPR is not enabled\n");
 		return 0;
 	}
 
@@ -908,7 +908,7 @@ int icnss_update_cpr_info(struct icnss_priv *priv)
 				tcs_cmd_data_addr = tcs_cmd_addr +
 					TCS_CMD_DATA_ADDR_OFFSET;
 				voltage_tmp = readl_relaxed(tcs_cmd_data_addr);
-				icnss_pr_dbg("Got voltage %dmV from i: %d, j: %d\n",
+				icnss_pr_info("Got voltage %dmV from i: %d, j: %d\n",
 					     voltage_tmp, i, j);
 
 				if (voltage_tmp > voltage) {
@@ -932,7 +932,7 @@ int icnss_update_cpr_info(struct icnss_priv *priv)
 update_cpr:
 	cpr_info->voltage = cpr_info->voltage > BT_CXMX_VOLTAGE_MV ?
 		cpr_info->voltage : BT_CXMX_VOLTAGE_MV;
-	icnss_pr_dbg("Update TCS CMD data address %pa with voltage %dmV\n",
+	icnss_pr_info("Update TCS CMD data address %pa with voltage %dmV\n",
 		     &cpr_info->tcs_cmd_data_addr, cpr_info->voltage);
 	writel_relaxed(cpr_info->voltage, cpr_info->tcs_cmd_data_addr_io);
 
